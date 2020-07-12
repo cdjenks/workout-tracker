@@ -3,59 +3,31 @@ const opts = { toJSON: { virtuals: true } };
 
 const Schema = mongoose.Schema;
 
-// const exerciseSchema = new Schema({
-//     type: String,
-//     name: String,
-//     duration: Number,
-//     weight: Number,
-//     reps: Number,
-//     sets: Number
-// })
-
-// exercises: { type: Array, "default": [] }
-
 const workoutSchema = new Schema({
-    day: Date,
+    day: {
+        type: Date,
+        default: Date.now
+    },
     exercises: [
         {
             type: String,
             name: String,
+            distance: Number,
             duration: Number,
             weight: Number,
             reps: Number,
             sets: Number
         }
     ]
+
 }, opts);
 
 workoutSchema.virtual("totalDuration").get(function () {
-    return { $sum: "$exercises.duration" };
+    return this.exercises.reduce(function (total, exercise) {
+        return total + exercise.duration;
+    }, 0);
 });
 
 const Workouts = mongoose.model("Workouts", workoutSchema);
 
 module.exports = Workouts;
-
-
-
-// {
-//     day: new Date(new Date().setDate(new Date().getDate() - 7)),
-//     exercises: [
-//       {
-//         type: "resistance",
-//         name: "Bicep Curl",
-//         duration: 20,
-//         weight: 100,
-//         reps: 10,
-//         sets: 4
-//       },
-//       {
-//         type: "resistance",
-//         name: "Bench Press",
-//         duration: 20,
-//         weight: 285,
-//         reps: 10,
-//         sets: 4
-//       }
-//     ]
-// }
